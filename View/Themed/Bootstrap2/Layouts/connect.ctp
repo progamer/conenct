@@ -24,13 +24,6 @@
             'bootstrap-responsive',
             'style'
         ));
-        echo $this->Layout->js();
-        echo $this->Html->script(array(
-            'jquery.min',
-            'bootstrap'
-            
-        ));
-        echo $scripts_for_layout;
     ?>
 </head>
 <body>
@@ -77,7 +70,7 @@
             <div class="span12">
                 <div class="well">
                 <div class="span5">
-                    Theme by <a href="http://www.linkedin.com/profile/view?id=76383741&trk=tab_pro">Nitish Dhar</a> Powered by <a href="http://www.croogo.org">Croogo</a>.
+                    Theme by <a href="http://www.linkedin.com/profile/view?id=76383741&trk=tab_pro">Issa Khalil</a> Powered by <a href="http://www.croogo.org">Croogo</a>.
                 </div>
                 <div class="span1 offset4">
                     <a href="http://www.cakephp.org"><?php echo $this->Html->image('/img/cake.power.gif'); ?></a>
@@ -86,5 +79,17 @@
             </div>
         </div>
     </div>
+
+    <?php echo $this->Layout->js(); ?>
+    
+    <?php echo $this->Html->script(array(
+        'jquery.min',
+        'bootstrap'
+        
+    )); ?>
+     
+    <?php echo $scripts_for_layout; ?>   
+        
+   <?php  echo $this->fetch('scriptBottom'); ?>
     </body>
 </html>

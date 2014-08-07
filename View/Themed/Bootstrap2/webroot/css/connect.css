@@ -1,8 +1,47 @@
+.map-wrapper{
+}
 #map_canvas { 
 	height: 480px; 
+	width: 75%;
+	float: left;
+}
+#overlay{
+	width: 25%;
+	height: 480px; 
+	float: left;
+	position: relative;
 }
 
 .place-thumb img{
 	width: 100px;
 	min-height: 80px;
 }
+
+.preview-wrapper{
+	height: 460px;
+}
+
+.comments-list .media{
+	padding: 5px;
+}
+
+#comment-box {
+	position: absolute;
+	bottom: -20px;
+	width: 100%;
+	background-color: #DDD;
+}
+
+#comment-box textarea {
+	height: 40px;
+	width: 94%;
+	margin: 1%;
+	padding: 2%;
+}
+.scrollable-wrapper{
+	overflow-y:scroll;
+	height: 395px; 
+}
+
+
+

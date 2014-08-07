@@ -1,0 +1,15 @@
+{
+    "name": "Connect",
+    "description": "Demo plugin bult by issa khalil",
+
+    "author": "Issa Khalil",
+    "authorEmail": "issa.mh.khalil@gmail.com",
+    "authorUrl": "http://issakhalil.info",
+
+    "dependencies": {
+      "plugins": [
+        "acl",
+          "extensions"
+          ]
+        }
+} 

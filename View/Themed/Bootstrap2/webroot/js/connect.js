@@ -6,6 +6,7 @@ var lon = 35.200;
 var distance  = 1000;
 
 var appid = 1448359755430086;
+var user = null;
 
 
 $(document).ready(function() {
@@ -34,37 +35,49 @@ $(document).ready(function() {
   		version : 'v2.0'
   	});     
 
-  	
+    //based on login sataus , we call findPlaces function or we authnticate him then call findPlaces	
   	FB.getLoginStatus(function(response) {
 	  
-	  if (response.status === 'connected') {
-	  	findPlaces( lat, lon, distance );
-	  }
-	  else {
-	    FB.login(function(){
-  			findPlaces( lat, lon, distance );
-  		});
-	  }
-	});
-
-  	
-  	// map.on('click', function( event ){
-  	// 	findPlaces( event.latlng.lat, event.latlng.lng, 50000 );
-  	// });
-
+  	  if (response.status === 'connected') {
+  	  	findPlaces( lat, lon, distance );
+  	  }
+  	  else {
+  	    FB.login(function(){
+    			findPlaces( lat, lon, distance );
+    		});
+  	  }
+  	});
   });
 });
 
+ //compile handlbars template
+var location_view_template= null;
+var comments_template = null;
+var template = null;
+
+$(function(){
+      location_view_template = Handlebars.compile( $("#location-view-template").html() );
+      comments_template = Handlebars.compile( $("#comments-list-template").html() );
+      template = Handlebars.compile( $("#popup-template").html() );
+});
+ 
+
 function findPlaces( lat, lon, distance ){
 
+  if( user == null ){
+      //read user data from fb
+      FB.api( "/me",function(resp){
+        user = resp;
+      });
+  }
 
-	var template = Handlebars.compile( $("#popup-template").html() );
-
+  //find places 
 
 	FB.api( "/search?q=*&type=place&center="+lat+","+lon+"&distance="+distance,function(resp){
 		
+
+    //build markers , add markers to cluter, then add cluster layer to map
 		$.each(resp.data, function(index, place) {
-			console.log( place );
 			var marker = L.marker([ place.location.latitude , place.location.longitude]);
 			marker.bindPopup( template( place )).openPopup();
 			markers.addLayer(marker);
@@ -73,5 +86,62 @@ function findPlaces( lat, lon, distance ){
 		map.addLayer(markers);
 
 	});
-
 }
+
+//handle comment form submition
+$(document).on("submit","#comment-box",function( event ){
+
+  event.preventDefault();
+  
+  $form = $(this);
+  if( $form.hasClass('disabled') ){
+    return false;
+  }
+
+  $form.addClass('disabled'); 
+  $data = $form.serializeArray();
+  $("button i", $form).attr('class', 'icon-spinner icon-spin');
+  $( "input, select, button, textareas", $form ).attr('disabled', 'disabled');
+  $( ".help-block" , $form ).text('').removeClass('error').removeClass('error-text');
+
+  $.post( $form.attr('action'), $data, function( resp ){
+    if( resp.success ){
+
+      $.get( comments_url +"/" + $( "#LocationsCommentFacebookLocationId" ,$form ).val() , function( resp ){
+          var html = comments_template( { 'comments' : resp } );
+          $(".comments-list").html( html );  
+           var elem = $(".scrollable-wrapper").get(0);
+       elem.scrollTop = elem.scrollHeight;
+
+      },'json');
+
+      $form.get(0).reset();
+    }
+    else{
+    }
+    $form.removeClass('disabled');
+    $( "input, select, button,textarea", $form ).attr('disabled', false);
+    $("button i", $form).attr('class', 'icon-save');
+
+  },'json');
+});
+
+
+
+//hanle view location proccess
+$(document).on("click",".view-location-button",function( event ){
+    event.preventDefault();
+    $btn = $(this);
+    $.get( $btn.attr('url'), function( resp ){
+      var html = location_view_template( { 'comments' : resp, 'id' : $btn.attr('location-id') } );
+      $("#overlay").html( html );  
+      $("#LocationsCommentFacebookLocationId").val( $btn.attr('location-id') );
+      $("#LocationsCommentFacebookUserId").val( user.id );
+      $("#LocationsCommentName").val( user.name );
+
+      var elem = $(".scrollable-wrapper").get(0);
+      elem.scrollTop = elem.scrollHeight;
+
+    },'json');
+});
+
